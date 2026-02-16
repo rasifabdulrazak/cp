@@ -287,8 +287,10 @@ img.loaded {
     /* Ensure logo is above mobile menu */
 }
 
-.logo span {
-    color: var(--primary-blue);
+/* Logo Styles Updated for Image */
+.logo img {
+    display: block;
+    /* Ensure no extra space below img */
 }
 
 .nav-links {
