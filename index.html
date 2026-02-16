@@ -1,1383 +1,320 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C-Portals | Building the Future with Strength & Precision</title>
-    <meta name="description" content="C-Portals delivers world-class construction solutions with modern engineering. 120+ projects completed, 15+ years experience.">
-    
-    <!-- Fonts -->
+    <title>C-Portals | Building Tomorrow's Infrastructure</title>
+    <meta name="description"
+        content="C-Portals delivers world-class construction solutions with precision and trust. Projects like Bechtel, Skanska, and Turner.">
+
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;900&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <!-- Three.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    
-    <style>
-        :root {
-            --concrete-dark: #1a1a1a;
-            --concrete-gray: #2d2d2d;
-            --steel-blue: #0a4d68;
-            --steel-light: #088395;
-            --accent-yellow: #0ec1fc;
-            --accent-orange: #33f8ff;
-            --text-white: #ffffff;
-            --text-gray: #b0b0b0;
-            --grid-color: rgba(8, 131, 149, 0.15);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Work Sans', sans-serif;
-            background: var(--concrete-dark);
-            color: var(--text-white);
-            overflow-x: hidden;
-            line-height: 1.6;
-        }
-
-        /* Loading Screen */
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--concrete-dark);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-
-        #loading-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .loader-logo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3rem;
-            font-weight: 900;
-            color: var(--accent-yellow);
-            text-transform: uppercase;
-            letter-spacing: 0.2em;
-            margin-bottom: 2rem;
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        .loader-bar {
-            width: 300px;
-            height: 4px;
-            background: var(--concrete-gray);
-            border-radius: 2px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .loader-progress {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            background: linear-gradient(90deg, var(--steel-blue), var(--accent-yellow));
-            width: 0%;
-            animation: loading 2s ease-in-out forwards;
-        }
-
-        @keyframes loading {
-            to { width: 100%; }
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.6; }
-        }
-
-        /* Blueprint Grid Background */
-        .blueprint-grid {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(var(--grid-color) 1px, transparent 1px),
-                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
-            background-size: 50px 50px;
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.3;
-        }
-
-        /* Navigation */
-        nav {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            padding: 1.5rem 5%;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-
-        nav.scrolled {
-            background: rgba(26, 26, 26, 0.95);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(0, 242, 255, 0.2);
-        }
-
-        .logo {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.8rem;
-            font-weight: 900;
-            color: var(--accent-yellow);
-            text-transform: uppercase;
-            letter-spacing: 0.15em;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .logo:hover {
-            color: var(--accent-orange);
-            text-shadow: 0 0 20px rgba(0, 204, 255, 0.5);
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 3rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--text-gray);
-            text-decoration: none;
-            font-weight: 500;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            letter-spacing: 0.1em;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .nav-links a::after {
-            content: '';
-            position: absolute;
-            bottom: -5px;
-            left: 0;
-            width: 0%;
-            height: 2px;
-            background: var(--accent-yellow);
-            transition: width 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: var(--accent-yellow);
-        }
-
-        .nav-links a:hover::after {
-            width: 100%;
-        }
-
-        .menu-toggle {
-            display: none;
-            flex-direction: column;
-            gap: 6px;
-            cursor: pointer;
-        }
-
-        .menu-toggle span {
-            width: 30px;
-            height: 3px;
-            background: var(--accent-yellow);
-            transition: all 0.3s ease;
-        }
-
-        /* Hero Section */
-        #hero {
-            position: relative;
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-        }
-
-        #three-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        .hero-content {
-            position: relative;
-            z-index: 2;
-            text-align: center;
-            padding: 2rem;
-            max-width: 1200px;
-        }
-
-        .hero-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(2.5rem, 8vw, 5rem);
-            font-weight: 900;
-            line-height: 1.1;
-            margin-bottom: 1.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            background: linear-gradient(135deg, var(--text-white), var(--accent-yellow));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: fadeInUp 1s ease-out 0.5s both;
-        }
-
-        .hero-subtitle {
-            font-size: clamp(1rem, 2.5vw, 1.5rem);
-            color: var(--text-gray);
-            margin-bottom: 3rem;
-            font-weight: 300;
-            animation: fadeInUp 1s ease-out 0.7s both;
-        }
-
-        .hero-buttons {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            flex-wrap: wrap;
-            animation: fadeInUp 1s ease-out 0.9s both;
-        }
-
-        .btn {
-            padding: 1rem 2.5rem;
-            font-family: 'Work Sans', sans-serif;
-            font-size: 1rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--accent-yellow), var(--accent-orange));
-            color: var(--concrete-dark);
-            box-shadow: 0 10px 30px rgba(255, 165, 0, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(255, 165, 0, 0.5);
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: var(--text-white);
-            border: 2px solid var(--accent-yellow);
-        }
-
-        .btn-secondary:hover {
-            background: var(--accent-yellow);
-            color: var(--concrete-dark);
-            transform: translateY(-3px);
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Sections */
-        section {
-            position: relative;
-            padding: 8rem 5%;
-            z-index: 2;
-        }
-
-        .section-title {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            font-weight: 700;
-            text-align: center;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--accent-yellow);
-        }
-
-        .section-subtitle {
-            text-align: center;
-            color: var(--text-gray);
-            font-size: 1.2rem;
-            margin-bottom: 4rem;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* About Section */
-        #about {
-            background: linear-gradient(180deg, var(--concrete-dark) 0%, var(--concrete-gray) 100%);
-        }
-
-        .about-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4rem;
-            align-items: center;
-        }
-
-        .about-text h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 2rem;
-            margin-bottom: 1.5rem;
-            color: var(--accent-yellow);
-        }
-
-        .about-text p {
-            color: var(--text-gray);
-            margin-bottom: 1.5rem;
-            line-height: 1.8;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 2rem;
-        }
-
-        .stat-card {
-            text-align: center;
-            padding: 2rem;
-            background: rgba(8, 131, 149, 0.1);
-            border: 1px solid var(--steel-blue);
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--accent-yellow);
-            box-shadow: 0 10px 30px rgba(255, 165, 0, 0.2);
-        }
-
-        .stat-number {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 3rem;
-            font-weight: 900;
-            color: var(--accent-yellow);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            color: var(--text-gray);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-
-        /* Services Section */
-        #services {
-            background: var(--concrete-dark);
-        }
-
-        .services-grid {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .service-card {
-            background: var(--concrete-gray);
-            padding: 3rem 2rem;
-            border: 1px solid rgba(8, 131, 149, 0.3);
-            border-radius: 8px;
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .service-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 165, 0, 0.1), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .service-card:hover::before {
-            left: 100%;
-        }
-
-        .service-card:hover {
-            transform: translateY(-10px);
-            border-color: var(--accent-yellow);
-            box-shadow: 0 15px 40px rgba(255, 165, 0, 0.2);
-        }
-
-        .service-icon {
-            font-size: 3rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .service-card h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--accent-yellow);
-        }
-
-        .service-card p {
-            color: var(--text-gray);
-            line-height: 1.7;
-        }
-
-        /* Projects Section */
-        #projects {
-            background: var(--concrete-gray);
-        }
-
-        .projects-grid {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-        }
-
-        .project-card {
-            background: var(--concrete-dark);
-            border-radius: 8px;
-            overflow: hidden;
-            transition: all 0.4s ease;
-            cursor: pointer;
-            border: 1px solid rgba(8, 131, 149, 0.3);
-        }
-
-        .project-card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 20px 50px rgba(255, 165, 0, 0.3);
-        }
-
-        .project-image {
-            width: 100%;
-            height: 250px;
-            background: linear-gradient(135deg, var(--steel-blue), var(--steel-light));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4rem;
-            color: rgba(255, 255, 255, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .project-image::before {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, transparent 30%, rgba(255, 165, 0, 0.2) 50%, transparent 70%);
-            transform: translateX(-100%);
-            transition: transform 0.6s ease;
-        }
-
-        .project-card:hover .project-image::before {
-            transform: translateX(100%);
-        }
-
-        .project-info {
-            padding: 2rem;
-        }
-
-        .project-info h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.5rem;
-            margin-bottom: 0.5rem;
-            color: var(--accent-yellow);
-        }
-
-        .project-meta {
-            display: flex;
-            gap: 1.5rem;
-            margin-bottom: 1rem;
-            font-size: 0.9rem;
-            color: var(--text-gray);
-        }
-
-        .project-meta span {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .project-info p {
-            color: var(--text-gray);
-            line-height: 1.6;
-        }
-
-        /* Why Choose Us */
-        #why-choose {
-            background: var(--concrete-dark);
-        }
-
-        .features-grid {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 3rem;
-        }
-
-        .feature-item {
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .feature-item:hover {
-            transform: translateY(-10px);
-        }
-
-        .feature-icon {
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 1.5rem;
-            background: linear-gradient(135deg, var(--steel-blue), var(--steel-light));
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            border: 3px solid var(--accent-yellow);
-            transition: all 0.3s ease;
-        }
-
-        .feature-item:hover .feature-icon {
-            transform: rotate(360deg);
-            box-shadow: 0 10px 30px rgba(255, 165, 0, 0.4);
-        }
-
-        .feature-item h3 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: 1.3rem;
-            margin-bottom: 1rem;
-            color: var(--accent-yellow);
-        }
-
-        .feature-item p {
-            color: var(--text-gray);
-        }
-
-        /* Testimonials */
-        #testimonials {
-            background: var(--concrete-gray);
-        }
-
-        .testimonials-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .testimonial-track {
-            display: flex;
-            gap: 2rem;
-            animation: scroll 20s linear infinite;
-            padding: 1rem 0;
-        }
-
-        .testimonial-track:hover {
-            animation-play-state: paused;
-        }
-
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(calc(-100% - 2rem)); }
-        }
-
-        .testimonial-card {
-            min-width: 400px;
-            background: var(--concrete-dark);
-            padding: 2.5rem;
-            border-radius: 8px;
-            border: 1px solid var(--steel-blue);
-            transition: all 0.3s ease;
-        }
-
-        .testimonial-card:hover {
-            border-color: var(--accent-yellow);
-            transform: scale(1.05);
-        }
-
-        .testimonial-text {
-            color: var(--text-gray);
-            font-style: italic;
-            margin-bottom: 1.5rem;
-            line-height: 1.8;
-        }
-
-        .testimonial-author {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .author-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--steel-blue), var(--accent-yellow));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-
-        .author-info h4 {
-            color: var(--accent-yellow);
-            margin-bottom: 0.25rem;
-        }
-
-        .author-info p {
-            color: var(--text-gray);
-            font-size: 0.9rem;
-        }
-
-        /* Contact CTA */
-        #contact-cta {
-            background: linear-gradient(135deg, var(--steel-blue), var(--accent-orange));
-            text-align: center;
-            padding: 6rem 5%;
-        }
-
-        #contact-cta h2 {
-            font-family: 'Orbitron', sans-serif;
-            font-size: clamp(2rem, 5vw, 3.5rem);
-            margin-bottom: 1rem;
-            color: var(--text-white);
-        }
-
-        #contact-cta p {
-            font-size: 1.3rem;
-            margin-bottom: 2.5rem;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        /* Footer */
-        footer {
-            background: var(--concrete-dark);
-            padding: 4rem 5% 2rem;
-            border-top: 1px solid var(--steel-blue);
-        }
-
-        .footer-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 3rem;
-            margin-bottom: 3rem;
-        }
-
-        .footer-section h3 {
-            font-family: 'Orbitron', sans-serif;
-            color: var(--accent-yellow);
-            margin-bottom: 1.5rem;
-            font-size: 1.3rem;
-        }
-
-        .footer-section p,
-        .footer-section a {
-            color: var(--text-gray);
-            text-decoration: none;
-            display: block;
-            margin-bottom: 0.8rem;
-            transition: color 0.3s ease;
-        }
-
-        .footer-section a:hover {
-            color: var(--accent-yellow);
-        }
-
-        .footer-bottom {
-            text-align: center;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(8, 131, 149, 0.3);
-            color: var(--text-gray);
-        }
-
-        /* Scroll Reveal Animation */
-        .reveal {
-            opacity: 0;
-            transform: translateY(50px);
-            transition: all 0.8s ease;
-        }
-
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Dark Mode Toggle */
-        .theme-toggle {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--accent-yellow);
-            border: none;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: 0 5px 20px rgba(255, 165, 0, 0.4);
-            transition: all 0.3s ease;
-            z-index: 999;
-        }
-
-        .theme-toggle:hover {
-            transform: scale(1.1) rotate(180deg);
-            box-shadow: 0 8px 30px rgba(255, 165, 0, 0.6);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav-links {
-                position: fixed;
-                top: 0;
-                right: -100%;
-                height: 100vh;
-                width: 70%;
-                background: rgba(26, 26, 26, 0.98);
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                gap: 2rem;
-                transition: right 0.3s ease;
-            }
-
-            .nav-links.active {
-                right: 0;
-            }
-
-            .menu-toggle {
-                display: flex;
-                z-index: 1001;
-            }
-
-            .about-content {
-                grid-template-columns: 1fr;
-            }
-
-            .projects-grid,
-            .services-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .testimonial-card {
-                min-width: 300px;
-            }
-        }
-    </style>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&family=Oswald:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
 </head>
-<body>
-    <!-- Loading Screen -->
-    <div id="loading-screen">
-        <div class="loader-logo">C-PORTALS</div>
-        <div class="loader-bar">
-            <div class="loader-progress"></div>
-        </div>
-    </div>
 
-    <!-- Blueprint Grid Background -->
-    <div class="blueprint-grid"></div>
+<body>
 
     <!-- Navigation -->
-    <nav id="navbar">
-        <div class="logo">C-PORTALS</div>
-        <ul class="nav-links" id="navLinks">
-            <li><a href="#home">Home</a></li>
-            <li><a href="#about">About</a></li>
-            <li><a href="#services">Services</a></li>
-            <li><a href="#projects">Projects</a></li>
-            <li><a href="#contact-cta">Contact</a></li>
-        </ul>
-        <div class="menu-toggle" id="menuToggle">
-            <span></span>
-            <span></span>
-            <span></span>
+    <nav class="navbar">
+        <div class="logo">
+            <span>//</span> C-PORTALS
         </div>
+        <div class="menu-toggle">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="index.html" class="nav-link">Home</a></li>
+            <li><a href="pages/about.html" class="nav-link">About Us</a></li>
+            <li><a href="pages/services.html" class="nav-link">Services</a></li>
+            <li><a href="pages/projects.html" class="nav-link">Projects</a></li>
+            <li><a href="pages/contact.html" class="nav-link">Contact</a></li>
+        </ul>
+        <a href="pages/contact.html" class="btn btn-outline" style="padding: 0.5rem 1.5rem; font-size: 0.9rem;">Get
+            Quote</a>
     </nav>
 
     <!-- Hero Section -->
-    <section id="hero">
-        <canvas id="three-canvas"></canvas>
+    <header class="hero">
         <div class="hero-content">
-            <h1 class="hero-title">Building the Future with Strength & Precision</h1>
-            <p class="hero-subtitle">C-Portals delivers world-class construction solutions with modern engineering</p>
-            <div class="hero-buttons">
-                <a href="#projects" class="btn btn-primary">View Projects</a>
-                <a href="#contact-cta" class="btn btn-secondary">Get a Quote</a>
+            <h1 class="heading-xl">Building Tomorrow’s <span class="text-highlight">Infrastructure</span> Today</h1>
+            <p class="text-lead">C-Portals delivers reliable, large-scale construction solutions with engineering
+                excellence and precision.</p>
+            <div class="flex">
+                <a href="pages/projects.html" class="btn btn-primary">View Projects</a>
+                <a href="pages/contact.html" class="btn btn-outline">Request Quote</a>
             </div>
         </div>
-    </section>
+        <canvas id="three-canvas" class="hero-canvas"></canvas>
+    </header>
 
-    <!-- About Section -->
-    <section id="about">
-        <h2 class="section-title reveal">About C-Portals</h2>
-        <p class="section-subtitle reveal">Leading the construction industry with innovation and excellence</p>
-        
-        <div class="about-content">
-            <div class="about-text reveal">
-                <h3>Who We Are</h3>
-                <p>C-Portals is a premier construction and engineering firm dedicated to transforming visions into reality. With over 15 years of industry excellence, we combine traditional craftsmanship with cutting-edge technology to deliver projects that stand the test of time.</p>
-                
-                <p>Our commitment to quality, safety, and innovation has made us a trusted partner for residential, commercial, and industrial construction projects across the region. We don't just build structures; we create portals to the future.</p>
-                
-                <p>Every project we undertake is executed with precision, transparency, and an unwavering commitment to exceeding client expectations.</p>
+    <!-- Trust Metrics -->
+    <section class="stats-section section">
+        <div class="container grid-4">
+            <div class="stat-item">
+                <div class="stat-number" data-target="120">0</div>
+                <div class="stat-label">Projects Completed</div>
             </div>
-            
-            <div class="stats-grid reveal">
-                <div class="stat-card">
-                    <div class="stat-number" data-target="120">0</div>
-                    <div class="stat-label">Projects Completed</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" data-target="15">0</div>
-                    <div class="stat-label">Years Experience</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" data-target="50">0</div>
-                    <div class="stat-label">Expert Engineers</div>
-                </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="15">0</div>
+                <div class="stat-label">Years of Excellence</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="50">0</div>
+                <div class="stat-label">Expert Engineers</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="10">0</div>
+                <div class="stat-label">Cities Served</div>
             </div>
         </div>
     </section>
 
     <!-- Services Section -->
-    <section id="services">
-        <h2 class="section-title reveal">Our Services</h2>
-        <p class="section-subtitle reveal">Comprehensive construction solutions tailored to your needs</p>
-        
-        <div class="services-grid">
-            <div class="service-card reveal">
-                <div class="service-icon">🏠</div>
-                <h3>Residential Construction</h3>
-                <p>From dream homes to multi-family developments, we create living spaces that blend comfort, style, and functionality with precision engineering.</p>
+    <section class="section" id="services">
+        <div class="container">
+            <div class="flex-between" style="margin-bottom: 4rem; align-items: flex-end;">
+                <div>
+                    <h2 class="heading-lg">Our <span class="text-highlight">Expertise</span></h2>
+                    <p class="text-lead" style="margin-bottom: 0;">Comprehensive construction solutions for every scale.
+                    </p>
+                </div>
+                <a href="pages/services.html" class="btn btn-outline">View All Services</a>
             </div>
-            
-            <div class="service-card reveal">
-                <div class="service-icon">🏢</div>
-                <h3>Commercial Buildings</h3>
-                <p>State-of-the-art office complexes, retail spaces, and mixed-use developments designed to maximize efficiency and aesthetic appeal.</p>
-            </div>
-            
-            <div class="service-card reveal">
-                <div class="service-icon">🏭</div>
-                <h3>Industrial Projects</h3>
-                <p>Heavy-duty facilities, warehouses, and manufacturing plants built to withstand demanding operational requirements.</p>
-            </div>
-            
-            <div class="service-card reveal">
-                <div class="service-icon">🔧</div>
-                <h3>Renovation & Remodeling</h3>
-                <p>Transform existing spaces with expert renovation services that breathe new life into aging structures while preserving their character.</p>
-            </div>
-            
-            <div class="service-card reveal">
-                <div class="service-icon">📐</div>
-                <h3>Architectural Design</h3>
-                <p>Innovative design solutions that merge form and function, creating structures that are both beautiful and practical.</p>
-            </div>
-            
-            <div class="service-card reveal">
-                <div class="service-icon">📊</div>
-                <h3>Project Management</h3>
-                <p>End-to-end project oversight ensuring timely delivery, budget adherence, and quality control at every stage.</p>
+
+            <div class="grid services-grid grid-3">
+                <div class="card">
+                    <div class="card-icon">🏗️</div>
+                    <h3>Residential Construction</h3>
+                    <p>High-end residential complexes built with modern standards and premium finishes.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🏢</div>
+                    <h3>Commercial Buildings</h3>
+                    <p>State-of-the-art office spaces and commercial hubs designed for business growth.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🏭</div>
+                    <h3>Industrial Projects</h3>
+                    <p>Heavy-duty industrial infrastructure, factories, and warehouses built for durability.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">🔨</div>
+                    <h3>Renovation & Remodeling</h3>
+                    <p>Transforming existing structures into modern, efficient spaces.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">📐</div>
+                    <h3>Architectural Design</h3>
+                    <p>Visionary architectural planning integrated with structural engineering.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon">👷</div>
+                    <h3>Project Management</h3>
+                    <p>End-to-end project oversight ensuring timeline and budget adherence.</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Projects Section -->
-    <section id="projects">
-        <h2 class="section-title reveal">Featured Projects</h2>
-        <p class="section-subtitle reveal">Showcasing our commitment to excellence</p>
-        
-        <div class="projects-grid">
-            <div class="project-card reveal">
-                <div class="project-image">🏗️</div>
-                <div class="project-info">
-                    <h3>Skyline Tower</h3>
-                    <div class="project-meta">
-                        <span>📍 Downtown District</span>
-                        <span>🏢 Commercial</span>
+    <!-- Featured Projects -->
+    <section class="section" style="background-color: var(--concrete-gray);">
+        <div class="container">
+            <h2 class="heading-lg" style="text-align: center;">Featured <span class="text-highlight">Projects</span>
+            </h2>
+            <p class="text-lead" style="text-align: center; margin: 0 auto 4rem auto;">A showcase of our engineering
+                excellence across the globe.</p>
+
+            <div class="grid grid-2">
+                <div class="project-card">
+                    <img src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?q=80&w=2070&auto=format&fit=crop"
+                        alt="Skyline Tower" class="project-img">
+                    <div class="project-overlay">
+                        <h3 class="heading-md text-highlight">Skyline Tower</h3>
+                        <p>Commercial | New York</p>
                     </div>
-                    <p>A 25-story mixed-use development featuring premium office spaces and retail units, completed 2 months ahead of schedule.</p>
+                </div>
+                <div class="project-card">
+                    <img src="https://images.unsplash.com/photo-1590644365607-1c5aef9452e5?q=80&w=2070&auto=format&fit=crop"
+                        alt="Harbor Bridge" class="project-img">
+                    <div class="project-overlay">
+                        <h3 class="heading-md text-highlight">Harbor Bridge</h3>
+                        <p>Infrastructure | Sydney</p>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <img src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?q=80&w=2070&auto=format&fit=crop"
+                        alt="Tech Park" class="project-img">
+                    <div class="project-overlay">
+                        <h3 class="heading-md text-highlight">Innovation Tech Park</h3>
+                        <p>Industrial | Berlin</p>
+                    </div>
+                </div>
+                <div class="project-card">
+                    <img src="https://images.unsplash.com/photo-1503387762-592deb58ef4e?q=80&w=2070&auto=format&fit=crop"
+                        alt="Luxury Residences" class="project-img">
+                    <div class="project-overlay">
+                        <h3 class="heading-md text-highlight">Azure Residences</h3>
+                        <p>Residential | Dubai</p>
+                    </div>
                 </div>
             </div>
-            
-            <div class="project-card reveal">
-                <div class="project-image">🏘️</div>
-                <div class="project-info">
-                    <h3>Riverside Residences</h3>
-                    <div class="project-meta">
-                        <span>📍 Waterfront</span>
-                        <span>🏠 Residential</span>
-                    </div>
-                    <p>Luxury apartment complex with 150 units, featuring sustainable design and stunning river views.</p>
-                </div>
-            </div>
-            
-            <div class="project-card reveal">
-                <div class="project-image">🏭</div>
-                <div class="project-info">
-                    <h3>TechHub Manufacturing</h3>
-                    <div class="project-meta">
-                        <span>📍 Industrial Park</span>
-                        <span>🏭 Industrial</span>
-                    </div>
-                    <p>State-of-the-art 200,000 sq ft manufacturing facility with advanced automation systems.</p>
-                </div>
-            </div>
-            
-            <div class="project-card reveal">
-                <div class="project-image">🏫</div>
-                <div class="project-info">
-                    <h3>Innovation Academy</h3>
-                    <div class="project-meta">
-                        <span>📍 Education District</span>
-                        <span>🏢 Commercial</span>
-                    </div>
-                    <p>Modern educational facility with cutting-edge technology integration and sustainable features.</p>
-                </div>
-            </div>
-            
-            <div class="project-card reveal">
-                <div class="project-image">🏨</div>
-                <div class="project-info">
-                    <h3>Grand Plaza Hotel</h3>
-                    <div class="project-meta">
-                        <span>📍 City Center</span>
-                        <span>🏢 Commercial</span>
-                    </div>
-                    <p>5-star hospitality project featuring 200 rooms, conference facilities, and luxury amenities.</p>
-                </div>
-            </div>
-            
-            <div class="project-card reveal">
-                <div class="project-image">🏡</div>
-                <div class="project-info">
-                    <h3>Heritage Restoration</h3>
-                    <div class="project-meta">
-                        <span>📍 Historic Quarter</span>
-                        <span>🔧 Renovation</span>
-                    </div>
-                    <p>Careful restoration of a century-old landmark building, preserving its character while modernizing infrastructure.</p>
-                </div>
+
+            <div class="flex-center" style="margin-top: 4rem;">
+                <a href="pages/projects.html" class="btn btn-primary">View Full Portfolio</a>
             </div>
         </div>
     </section>
 
     <!-- Why Choose Us -->
-    <section id="why-choose">
-        <h2 class="section-title reveal">Why Choose C-Portals</h2>
-        <p class="section-subtitle reveal">The foundation of our success</p>
-        
-        <div class="features-grid">
-            <div class="feature-item reveal">
-                <div class="feature-icon">🛡️</div>
-                <h3>Safety First</h3>
-                <p>Zero-compromise approach to safety with industry-leading protocols and continuous training programs.</p>
-            </div>
-            
-            <div class="feature-item reveal">
-                <div class="feature-icon">⏰</div>
-                <h3>On-Time Delivery</h3>
-                <p>Rigorous project management ensures we meet deadlines without sacrificing quality or safety standards.</p>
-            </div>
-            
-            <div class="feature-item reveal">
-                <div class="feature-icon">👷</div>
-                <h3>Skilled Workforce</h3>
-                <p>Expert team of certified engineers, architects, and craftsmen with decades of combined experience.</p>
-            </div>
-            
-            <div class="feature-item reveal">
-                <div class="feature-icon">💻</div>
-                <h3>Modern Technology</h3>
-                <p>Cutting-edge tools and techniques including BIM, drones, and AI-powered project analytics.</p>
-            </div>
-            
-            <div class="feature-item reveal">
-                <div class="feature-icon">💰</div>
-                <h3>Transparent Pricing</h3>
-                <p>Clear, detailed quotes with no hidden costs. Our pricing reflects our commitment to integrity.</p>
+    <section class="section">
+        <div class="container">
+            <div class="grid grid-2" style="align-items: center;">
+                <div>
+                    <h2 class="heading-lg">Why <span class="text-highlight">Choose Us?</span></h2>
+                    <ul class="grid">
+                        <li class="flex" style="align-items: flex-start;">
+                            <span style="color: var(--primary-yellow); font-size: 1.5rem;">✔</span>
+                            <div>
+                                <h3 class="heading-md" style="font-size: 1.2rem; margin-bottom: 0.5rem;">Safety First
+                                    Approach</h3>
+                                <p class="text-muted">We adhere to the strictest safety protocols to ensure zero
+                                    accidents.</p>
+                            </div>
+                        </li>
+                        <li class="flex" style="align-items: flex-start;">
+                            <span style="color: var(--primary-yellow); font-size: 1.5rem;">✔</span>
+                            <div>
+                                <h3 class="heading-md" style="font-size: 1.2rem; margin-bottom: 0.5rem;">On-Time
+                                    Delivery</h3>
+                                <p class="text-muted">Our project management systems ensure we meet every deadline.</p>
+                            </div>
+                        </li>
+                        <li class="flex" style="align-items: flex-start;">
+                            <span style="color: var(--primary-yellow); font-size: 1.5rem;">✔</span>
+                            <div>
+                                <h3 class="heading-md" style="font-size: 1.2rem; margin-bottom: 0.5rem;">Modern
+                                    Engineering Tools</h3>
+                                <p class="text-muted">We utilize BIM and advanced machinery for precision.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div style="position: relative;">
+                    <!-- Placeholder for an image or graphic -->
+                    <img src="https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?q=80&w=2070&auto=format&fit=crop"
+                        alt="Construction Site"
+                        style="border-radius: 4px; filter: grayscale(100%); transition: var(--transition-smooth);">
+                </div>
             </div>
         </div>
     </section>
 
     <!-- Testimonials -->
-    <section id="testimonials">
-        <h2 class="section-title reveal">What Our Clients Say</h2>
-        <p class="section-subtitle reveal">Building trust, one project at a time</p>
-        
-        <div class="testimonials-container">
-            <div class="testimonial-track">
-                <div class="testimonial-card">
-                    <p class="testimonial-text">"C-Portals transformed our vision into reality. Their attention to detail and commitment to quality exceeded all expectations. The project was completed ahead of schedule and within budget."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">JD</div>
-                        <div class="author-info">
-                            <h4>John Davidson</h4>
-                            <p>CEO, Davidson Enterprises</p>
-                        </div>
+    <section class="section" style="background-color: var(--dark-slate); border-top: 1px solid rgba(255,255,255,0.05);">
+        <div class="container">
+            <h2 class="heading-lg" style="text-align: center;">Client <span class="text-highlight">Trust</span></h2>
+            <div class="grid grid-3" style="margin-top: 3rem;">
+                <div class="card" style="background: rgba(255,255,255,0.03);">
+                    <p style="font-style: italic; margin-bottom: 1.5rem;">"C-Portals transformed our vision into reality
+                        with exceptional professionalism. The attention to detail on the Skyline Tower was unmatched."
+                    </p>
+                    <div>
+                        <h4 class="text-highlight">John Dawson</h4>
+                        <span class="text-muted">CEO, Skyline Properties</span>
                     </div>
                 </div>
-                
-                <div class="testimonial-card">
-                    <p class="testimonial-text">"Working with C-Portals was a game-changer. Their innovative approach and use of modern technology made the entire construction process transparent and efficient. Highly recommended!"</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">SM</div>
-                        <div class="author-info">
-                            <h4>Sarah Mitchell</h4>
-                            <p>Property Developer</p>
-                        </div>
+                <div class="card" style="background: rgba(255,255,255,0.03);">
+                    <p style="font-style: italic; margin-bottom: 1.5rem;">"Their engineering team is world-class. They
+                        handled complex structural challenges with ease and delivered ahead of schedule."</p>
+                    <div>
+                        <h4 class="text-highlight">Sarah Jenkins</h4>
+                        <span class="text-muted">Director, Urban Infra</span>
                     </div>
                 </div>
-                
-                <div class="testimonial-card">
-                    <p class="testimonial-text">"The team at C-Portals demonstrated exceptional professionalism throughout our industrial facility project. Their expertise in handling complex requirements was impressive."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">RC</div>
-                        <div class="author-info">
-                            <h4>Robert Chen</h4>
-                            <p>Operations Director, TechManufacturing Inc.</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Duplicate for seamless loop -->
-                <div class="testimonial-card">
-                    <p class="testimonial-text">"C-Portals transformed our vision into reality. Their attention to detail and commitment to quality exceeded all expectations. The project was completed ahead of schedule and within budget."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">JD</div>
-                        <div class="author-info">
-                            <h4>John Davidson</h4>
-                            <p>CEO, Davidson Enterprises</p>
-                        </div>
+                <div class="card" style="background: rgba(255,255,255,0.03);">
+                    <p style="font-style: italic; margin-bottom: 1.5rem;">"Reliable, transparent, and skilled. C-Portals
+                        is our go-to partner for all industrial expansion projects."</p>
+                    <div>
+                        <h4 class="text-highlight">Michael Chang</h4>
+                        <span class="text-muted">Ops Manager, TechGlobal</span>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Contact CTA -->
-    <section id="contact-cta">
-        <h2>Let's Build Something Great Together</h2>
-        <p>Ready to start your next project? Get in touch with our team today.</p>
-        <a href="mailto:info@c-portals.com" class="btn btn-primary">Contact C-Portals</a>
+    <!-- CTA -->
+    <section class="section"
+        style="text-align: center; background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('https://images.unsplash.com/photo-1531834685032-c34bf0d84c7c?q=80&w=1997&auto=format&fit=crop'); background-size: cover; background-attachment: fixed;">
+        <div class="container">
+            <h2 class="heading-lg">Let’s Build Something <span class="text-highlight">Great</span> Together</h2>
+            <p class="text-lead" style="margin: 0 auto 2rem auto; color: var(--white);">Ready to start your next
+                project? Contact us today for a consultation.</p>
+            <a href="pages/contact.html" class="btn btn-primary">Contact C-Portals Today</a>
+        </div>
     </section>
 
     <!-- Footer -->
     <footer>
-        <div class="footer-content">
-            <div class="footer-section">
-                <h3>C-PORTALS</h3>
-                <p>Building the future with strength and precision. Your trusted partner in construction excellence.</p>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <div class="logo" style="margin-bottom: 1rem;"><span>//</span> C-PORTALS</div>
+                    <p class="text-muted">Building the future with strength, precision, and integrity. World-class
+                        infrastructure for a better tomorrow.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <ul>
+                        <li><a href="pages/about.html">About Us</a></li>
+                        <li><a href="pages/services.html">Services</a></li>
+                        <li><a href="pages/projects.html">Projects</a></li>
+                        <li><a href="pages/contact.html">Careers</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Services</h4>
+                    <ul>
+                        <li><a href="pages/services.html">Residential</a></li>
+                        <li><a href="pages/services.html">Commercial</a></li>
+                        <li><a href="pages/services.html">Industrial</a></li>
+                        <li><a href="pages/services.html">Renovation</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Contact</h4>
+                    <ul>
+                        <li><a href="#">contact@cportals.com</a></li>
+                        <li><a href="#">+1 (555) 123-4567</a></li>
+                        <li><a href="#">123 Construction Ave,<br>Builder City, NY 10001</a></li>
+                    </ul>
+                </div>
             </div>
-            
-            <div class="footer-section">
-                <h3>Quick Links</h3>
-                <a href="#about">About Us</a>
-                <a href="#services">Services</a>
-                <a href="#projects">Projects</a>
-                <a href="#contact-cta">Contact</a>
+            <div class="footer-bottom">
+                &copy; 2024 C-Portals Construction. All Rights Reserved.
             </div>
-            
-            <div class="footer-section">
-                <h3>Services</h3>
-                <a href="#services">Residential Construction</a>
-                <a href="#services">Commercial Buildings</a>
-                <a href="#services">Industrial Projects</a>
-                <a href="#services">Renovation</a>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Contact Info</h3>
-                <p>📧 info@c-portals.com</p>
-                <p>📞 +1 (555) 123-4567</p>
-                <p>📍 123 Construction Ave, Building City, BC 12345</p>
-            </div>
-        </div>
-        
-        <div class="footer-bottom">
-            <p>&copy; 2026 C-Portals Construction. All rights reserved. | Built with precision and passion.</p>
         </div>
     </footer>
 
-    <!-- Dark Mode Toggle -->
-    <button class="theme-toggle" id="themeToggle" title="Toggle Theme">
-        🌙
-    </button>
+    <!-- Scripts -->
+    <!-- GSAP -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 
-    <script>
-        // Three.js Hero Scene
-        const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({
-            canvas: document.getElementById('three-canvas'),
-            alpha: true,
-            antialias: true
-        });
+    <!-- Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-
-        // Create wireframe building structure
-        const buildingGeometry = new THREE.BoxGeometry(2, 4, 2);
-        const edges = new THREE.EdgesGeometry(buildingGeometry);
-        const lineMaterial = new THREE.LineBasicMaterial({ 
-            color: 0xffa500,
-            linewidth: 2
-        });
-        const building = new THREE.LineSegments(edges, lineMaterial);
-        scene.add(building);
-
-        // Add multiple buildings
-        const buildings = [];
-        for (let i = 0; i < 5; i++) {
-            const size = Math.random() * 2 + 1;
-            const height = Math.random() * 4 + 2;
-            const geo = new THREE.BoxGeometry(size, height, size);
-            const edges = new THREE.EdgesGeometry(geo);
-            const mat = new THREE.LineBasicMaterial({ 
-                color: i % 2 === 0 ? 0xffa500 : 0x088395,
-                transparent: true,
-                opacity: 0.8
-            });
-            const bld = new THREE.LineSegments(edges, mat);
-            bld.position.x = (i - 2) * 3;
-            bld.position.y = -height / 2;
-            scene.add(bld);
-            buildings.push(bld);
-        }
-
-        // Add grid
-        const gridHelper = new THREE.GridHelper(20, 20, 0x088395, 0x088395);
-        gridHelper.material.opacity = 0.2;
-        gridHelper.material.transparent = true;
-        gridHelper.position.y = -3;
-        scene.add(gridHelper);
-
-        // Lighting
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-        scene.add(ambientLight);
-        
-        const pointLight = new THREE.PointLight(0xffa500, 1);
-        pointLight.position.set(5, 5, 5);
-        scene.add(pointLight);
-
-        camera.position.z = 8;
-        camera.position.y = 1;
-
-        // Animation
-        let scrollY = 0;
-        let mouseX = 0;
-        let mouseY = 0;
-
-        function animate() {
-            requestAnimationFrame(animate);
-
-            // Rotate buildings
-            buildings.forEach((bld, index) => {
-                bld.rotation.y += 0.001 * (index + 1);
-                bld.position.y = Math.sin(Date.now() * 0.001 + index) * 0.2 - 2;
-            });
-
-            // Camera movement based on scroll and mouse
-            camera.position.y = 1 + scrollY * 0.002;
-            camera.rotation.x = mouseY * 0.0005;
-            camera.rotation.y = mouseX * 0.0005;
-
-            renderer.render(scene, camera);
-        }
-
-        animate();
-
-        // Scroll and mouse tracking
-        window.addEventListener('scroll', () => {
-            scrollY = window.scrollY;
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX - window.innerWidth / 2;
-            mouseY = e.clientY - window.innerHeight / 2;
-        });
-
-        // Responsive
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        });
-
-        // Loading Screen
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                document.getElementById('loading-screen').classList.add('hidden');
-            }, 2000);
-        });
-
-        // Navbar scroll effect
-        const navbar = document.getElementById('navbar');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 100) {
-                navbar.classList.add('scrolled');
-            } else {
-                navbar.classList.remove('scrolled');
-            }
-        });
-
-        // Mobile menu toggle
-        const menuToggle = document.getElementById('menuToggle');
-        const navLinks = document.getElementById('navLinks');
-
-        menuToggle.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-        });
-
-        // Close menu when clicking a link
-        document.querySelectorAll('.nav-links a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-            });
-        });
-
-        // Animated counter
-        function animateCounter(element) {
-            const target = parseInt(element.getAttribute('data-target'));
-            const duration = 2000;
-            const increment = target / (duration / 16);
-            let current = 0;
-
-            const updateCounter = () => {
-                current += increment;
-                if (current < target) {
-                    element.textContent = Math.floor(current) + '+';
-                    requestAnimationFrame(updateCounter);
-                } else {
-                    element.textContent = target + '+';
-                }
-            };
-
-            updateCounter();
-        }
-
-        // Scroll reveal animation
-        const reveals = document.querySelectorAll('.reveal');
-        
-        function checkReveal() {
-            reveals.forEach(element => {
-                const elementTop = element.getBoundingClientRect().top;
-                const elementVisible = 150;
-
-                if (elementTop < window.innerHeight - elementVisible) {
-                    element.classList.add('active');
-                    
-                    // Trigger counter animation for stat numbers
-                    if (element.querySelector('.stat-number')) {
-                        const counters = element.querySelectorAll('.stat-number');
-                        counters.forEach(counter => {
-                            if (!counter.classList.contains('counted')) {
-                                counter.classList.add('counted');
-                                animateCounter(counter);
-                            }
-                        });
-                    }
-                }
-            });
-        }
-
-        window.addEventListener('scroll', checkReveal);
-        checkReveal(); // Check on load
-
-        // Dark mode toggle
-        const themeToggle = document.getElementById('themeToggle');
-        let isDark = true;
-
-        themeToggle.addEventListener('click', () => {
-            isDark = !isDark;
-            
-            if (!isDark) {
-                // Light mode
-                document.documentElement.style.setProperty('--concrete-dark', '#f5f5f5');
-                document.documentElement.style.setProperty('--concrete-gray', '#ffffff');
-                document.documentElement.style.setProperty('--text-white', '#1a1a1a');
-                document.documentElement.style.setProperty('--text-gray', '#666666');
-                themeToggle.textContent = '☀️';
-            } else {
-                // Dark mode
-                document.documentElement.style.setProperty('--concrete-dark', '#1a1a1a');
-                document.documentElement.style.setProperty('--concrete-gray', '#2d2d2d');
-                document.documentElement.style.setProperty('--text-white', '#ffffff');
-                document.documentElement.style.setProperty('--text-gray', '#b0b0b0');
-                themeToggle.textContent = '🌙';
-            }
-        });
-
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-    </script>
+    <!-- Custom Script -->
+    <script src="js/script.js"></script>
 </body>
+
 </html>
