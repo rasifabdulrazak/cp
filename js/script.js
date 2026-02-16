@@ -1,13 +1,58 @@
 /* 
    C-Portals | Interactions & Animations 
-   Three.js + GSAP 
+   Three.js + GSAP + Transitions 
 */
 
 document.addEventListener('DOMContentLoaded', () => {
+    initPageTransitions();
+    initSmoothImageLoading();
     initThreeJS();
     initGSAP();
     initUI();
 });
+
+/* =========================================
+   Page Transitions
+   ========================================= */
+function initPageTransitions() {
+    // Reveal body on load
+    document.body.classList.add('fade-in');
+
+    // Intercept clicks
+    const links = document.querySelectorAll('a');
+    links.forEach(link => {
+        link.addEventListener('click', (e) => {
+            const href = link.getAttribute('href');
+
+            // Allow internal page navigation to be intercepted
+            // Ignore anchors, target blank, or mailto/tel
+            if (href && !href.startsWith('#') && !href.startsWith('mailto:') && !href.startsWith('tel:') && link.target !== '_blank') {
+                e.preventDefault();
+                document.body.classList.remove('fade-in'); // Fade out
+
+                setTimeout(() => {
+                    window.location.href = href;
+                }, 400); // Match CSS transition duration
+            }
+        });
+    });
+}
+
+/* =========================================
+   Smooth Image Loading
+   ========================================= */
+function initSmoothImageLoading() {
+    const images = document.querySelectorAll('img');
+    images.forEach(img => {
+        if (img.complete) {
+            img.classList.add('loaded');
+        } else {
+            img.addEventListener('load', () => {
+                img.classList.add('loaded');
+            });
+        }
+    });
+}
 
 /* =========================================
    UI Interactivity
@@ -20,19 +65,28 @@ function initUI() {
     if (menuToggle) {
         menuToggle.addEventListener('click', () => {
             navLinks.classList.toggle('active');
-            menuToggle.classList.toggle('active'); // specific animation for toggle icon if needed
+            menuToggle.classList.toggle('active');
+        });
+
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+                menuToggle.classList.remove('active');
+            });
         });
     }
 
     // Sticky Navbar
     const navbar = document.querySelector('.navbar');
-    window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            navbar.classList.add('scrolled');
-        } else {
-            navbar.classList.remove('scrolled');
-        }
-    });
+    if (navbar) {
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+    }
 
     // Stats Counter Animation
     const statsSection = document.querySelector('.stats-section');
@@ -44,7 +98,7 @@ function initUI() {
                     observer.unobserve(entry.target);
                 }
             });
-        }, { threshold: 0.5 });
+        }, { threshold: 0.1 });
 
         observer.observe(statsSection);
     }
@@ -54,8 +108,8 @@ function animateCounters() {
     const counters = document.querySelectorAll('.stat-number');
     counters.forEach(counter => {
         const target = +counter.getAttribute('data-target');
-        const duration = 2000; // ms
-        const increment = target / (duration / 16); // 60fps update
+        const duration = 2000;
+        const increment = target / (duration / 16);
 
         let current = 0;
         const updateCounter = () => {
@@ -64,11 +118,7 @@ function animateCounters() {
                 counter.textContent = Math.ceil(current);
                 requestAnimationFrame(updateCounter);
             } else {
-                counter.textContent = target; // Ensure exact final value
-                // Add "+" if needed, handled in HTML usually or appended here
-                if (counter.textContent.length < 4) { // minimalistic check
-                    // counter.textContent += "+"; 
-                }
+                counter.textContent = target;
             }
         };
         updateCounter();
@@ -82,55 +132,91 @@ function initGSAP() {
     gsap.registerPlugin(ScrollTrigger);
 
     // Hero Text Stagger
-    gsap.from('.hero-content > *', {
-        y: 50,
-        opacity: 0,
-        duration: 1,
-        stagger: 0.2,
-        ease: 'power3.out',
-        delay: 0.5
-    });
-
-    // Section Titles
-    gsap.utils.toArray('.section-title').forEach(title => {
-        gsap.from(title, {
-            scrollTrigger: {
-                trigger: title,
-                start: 'top 80%',
-            },
-            y: 30,
-            opacity: 0,
-            duration: 0.8,
-            ease: 'power2.out'
+    if (document.querySelector('.hero-content')) {
+        gsap.to('.hero-content > *', {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            stagger: 0.2,
+            ease: 'power3.out',
+            delay: 0.2
         });
+    }
+
+    // Generic Section Animation (Headings)
+    gsap.utils.toArray('.heading-lg, .heading-xl').forEach(heading => {
+        gsap.fromTo(heading,
+            { y: 30, opacity: 0 },
+            {
+                scrollTrigger: {
+                    trigger: heading,
+                    start: 'top 85%',
+                    toggleActions: 'play none none reverse'
+                },
+                y: 0,
+                opacity: 1,
+                duration: 0.8,
+                ease: 'power2.out'
+            }
+        );
     });
 
-    // Service Cards Stagger
-    gsap.from('.card', {
-        scrollTrigger: {
-            trigger: '.services-grid',
-            start: 'top 75%'
-        },
-        y: 50,
-        opacity: 0,
-        duration: 0.8,
-        stagger: 0.1,
-        ease: 'power2.out'
+    // ROBUST CARD ANIMATION
+    // Instead of relying on a parent container trigger which might fail if the structure differs,
+    // we animate cards in batches based on their container, or correctly individually.
+
+    // Find all grids that contain cards
+    const grids = document.querySelectorAll('.grid, .grid-2, .grid-3, .grid-4');
+    grids.forEach(grid => {
+        const cards = grid.querySelectorAll('.card');
+        if (cards.length > 0) {
+            gsap.to(cards, {
+                scrollTrigger: {
+                    trigger: grid,
+                    start: 'top 85%'
+                },
+                y: 0,
+                opacity: 1,
+                duration: 0.8,
+                stagger: 0.1,
+                ease: 'power2.out'
+            });
+        }
+
+        // Also handle project cards in grids
+        const projectCards = grid.querySelectorAll('.project-card');
+        if (projectCards.length > 0) {
+            gsap.to(projectCards, {
+                scrollTrigger: {
+                    trigger: grid,
+                    start: 'top 85%'
+                },
+                y: 0,
+                opacity: 1,
+                duration: 0.8,
+                stagger: 0.1,
+                ease: 'power2.out'
+            });
+        }
     });
 
-    // Project Cards Parallax/Reveal
-    gsap.utils.toArray('.project-card').forEach((card, i) => {
-        gsap.from(card, {
-            scrollTrigger: {
-                trigger: card,
-                start: 'top 85%'
-            },
-            y: 50,
-            opacity: 0,
-            duration: 0.8,
-            delay: i * 0.1,
-            ease: 'power2.out'
-        });
+    // Fallback: If any card is missed (not in a .grid or individually placed), animate it when it comes into view
+    gsap.utils.toArray('.card, .project-card').forEach(card => {
+        // Check if already animated (gsap sets checks) or if we need a failsafe
+        // A simple way is to use a batch or individual triggers if they aren't part of a grid stagger
+        if (!card.style.opacity || card.style.opacity === '0') {
+            gsap.to(card, {
+                scrollTrigger: {
+                    trigger: card,
+                    start: 'top 90%'
+                },
+                y: 0,
+                opacity: 1,
+                duration: 0.8,
+                ease: 'power2.out',
+                overwrite: 'auto' // ensure grid stagger doesn't conflict
+            });
+        }
     });
 }
 
@@ -141,49 +227,41 @@ function initThreeJS() {
     const canvas = document.getElementById('three-canvas');
     if (!canvas) return;
 
-    // SCENE
     const scene = new THREE.Scene();
-    // scene.background = new THREE.Color(0x121212); // Match CSS background or transparent
-    // Keep transparent to blend with CSS gradient if any, or set color
 
-    // CAMERA
-    const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     camera.position.z = 5;
 
-    // RENDERER
     const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-    renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+    renderer.setSize(width, height);
     renderer.setPixelRatio(window.devicePixelRatio);
 
-    // GEOMETRY - Abstract Structural Beams (Icosahedron wireframe for now)
-    // A complex group of lines to resemble construction
     const geometry = new THREE.IcosahedronGeometry(2.5, 1);
     const wireframe = new THREE.WireframeGeometry(geometry);
     const line = new THREE.LineSegments(wireframe);
 
-    // Material
     const material = new THREE.LineBasicMaterial({
-        color: 0xFFD700, // Safety Yellow
+        color: 0x0EA5E9,
         transparent: true,
-        opacity: 0.3,
-        linewidth: 1 // Note: linewidth is always 1 on Windows WebGL usually
+        opacity: 0.5,
+        linewidth: 1
     });
 
     line.material = material;
     scene.add(line);
 
-    // Inner core structure
     const coreGeo = new THREE.IcosahedronGeometry(1.5, 0);
     const coreMat = new THREE.MeshBasicMaterial({
-        color: 0x2A2A2A,
+        color: 0x0F172A,
         wireframe: true,
         transparent: true,
-        opacity: 0.5
+        opacity: 0.3
     });
     const core = new THREE.Mesh(coreGeo, coreMat);
     scene.add(core);
 
-    // Particles
     const particlesGeo = new THREE.BufferGeometry();
     const particlesCount = 200;
     const posArray = new Float32Array(particlesCount * 3);
@@ -194,46 +272,32 @@ function initThreeJS() {
 
     particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
     const particlesMat = new THREE.PointsMaterial({
-        size: 0.02,
-        color: 0x787878,
+        size: 0.03,
+        color: 0x38BDF8,
     });
     const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
     scene.add(particlesMesh);
 
-    // ANIMATION LOOP
     const clock = new THREE.Clock();
 
     const animate = () => {
         requestAnimationFrame(animate);
-
         const elapsedTime = clock.getElapsedTime();
-
-        // Rotate main structure
         line.rotation.y = elapsedTime * 0.1;
         line.rotation.x = elapsedTime * 0.05;
-
-        // Counter rotate core
         core.rotation.y = -elapsedTime * 0.15;
         core.rotation.x = -elapsedTime * 0.05;
-
-        // Float particles
         particlesMesh.rotation.y = elapsedTime * 0.05;
-
-        // Mouse parallax (simple ease)
-        // (Optional: add mousemove event listener to update targetRotation)
-
         renderer.render(scene, camera);
     };
 
     animate();
 
-    // RESIZE HANDLER
     window.addEventListener('resize', () => {
-        const width = canvas.clientWidth;  // Use container dimensions
-        const height = canvas.clientHeight;
-
-        camera.aspect = width / height;
+        const newWidth = canvas.parentElement.clientWidth;
+        const newHeight = canvas.parentElement.clientHeight;
+        camera.aspect = newWidth / newHeight;
         camera.updateProjectionMatrix();
-        renderer.setSize(width, height, false); // false prevents resizing canvas style
+        renderer.setSize(newWidth, newHeight, false);
     });
 }
