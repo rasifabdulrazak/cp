@@ -274,6 +274,14 @@ img.loaded {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.mobile-only {
+    display: none;
+}
+
+.desktop-only {
+    display: inline-flex;
+}
+
 .logo {
     font-family: var(--font-heading);
     font-size: 1.5rem;
@@ -570,6 +578,14 @@ footer {
     .footer-grid {
         grid-template-columns: 1fr 1fr;
         gap: 2rem;
+    }
+
+    .mobile-only {
+        display: block;
+    }
+
+    .desktop-only {
+        display: none;
     }
 }
 
