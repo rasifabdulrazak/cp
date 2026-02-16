@@ -229,8 +229,16 @@ function initThreeJS() {
 
     const scene = new THREE.Scene();
 
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
+    // Safety check for dimensions
+    let width = canvas.clientWidth || canvas.parentElement.clientWidth;
+    let height = canvas.clientHeight || canvas.parentElement.clientHeight;
+
+    // Fallback if height is 0 (common on mobile load)
+    if (height === 0) {
+        height = window.innerHeight * 0.5; // Estimate 50vh
+        width = window.innerWidth;
+    }
+
     const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
     camera.position.z = 5;
 
