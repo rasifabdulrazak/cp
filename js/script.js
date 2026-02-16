@@ -16,7 +16,17 @@ document.addEventListener('DOMContentLoaded', () => {
    ========================================= */
 function initPageTransitions() {
     // Reveal body on load
-    document.body.classList.add('fade-in');
+    // Use setTimeout to ensure the transition happens after paint
+    setTimeout(() => {
+        document.body.classList.add('fade-in');
+    }, 50);
+
+    // Handle back/forward cache (bfcache)
+    window.addEventListener('pageshow', (event) => {
+        if (event.persisted) {
+            document.body.classList.add('fade-in');
+        }
+    });
 
     // Intercept clicks
     const links = document.querySelectorAll('a');
