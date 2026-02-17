@@ -374,23 +374,34 @@ img.loaded {
     position: relative;
     overflow: hidden;
     padding: 100px 5% 50px;
-    /* Top padding to account for fixed navbar */
+    /* Premium Gradient Background */
+    background: radial-gradient(circle at 70% 30%, #1e293b 0%, #0f172a 60%);
+    /* Animated Gradient Overlay using pseudo-element for performance */
 }
 
-.hero-content {
-    width: 100%;
-    max-width: 600px;
-    z-index: 2;
-    position: relative;
-}
-
-.hero-canvas {
+.hero::before {
+    content: '';
     position: absolute;
-    top: 0;
-    right: 0;
-    width: 50%;
-    height: 100%;
+    top: -50%;
+    right: -20%;
+    width: 80%;
+    height: 150%;
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.15) 0%, rgba(15, 23, 42, 0) 70%);
     z-index: 1;
+    animation: pulseGlow 8s infinite alternate ease-in-out;
+    pointer-events: none;
+}
+
+@keyframes pulseGlow {
+    0% {
+        transform: scale(1);
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
 }
 
 /* Trust Metrics */

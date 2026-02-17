@@ -6,7 +6,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     initPageTransitions();
     initSmoothImageLoading();
-    initThreeJS();
+    // initThreeJS(); // Removed for performance
     initGSAP();
     initUI();
 });
@@ -231,91 +231,5 @@ function initGSAP() {
 }
 
 /* =========================================
-   Three.js 3D Scene
+   Three.js 3D Scene - REMOVED FOR PERFORMANCE
    ========================================= */
-function initThreeJS() {
-    const canvas = document.getElementById('three-canvas');
-    if (!canvas) return;
-
-    const scene = new THREE.Scene();
-
-    // Safety check for dimensions
-    let width = canvas.clientWidth || canvas.parentElement.clientWidth;
-    let height = canvas.clientHeight || canvas.parentElement.clientHeight;
-
-    // Fallback if height is 0 (common on mobile load)
-    if (height === 0) {
-        height = window.innerHeight * 0.5; // Estimate 50vh
-        width = window.innerWidth;
-    }
-
-    const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    camera.position.z = 5;
-
-    const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-    renderer.setSize(width, height);
-    renderer.setPixelRatio(window.devicePixelRatio);
-
-    const geometry = new THREE.IcosahedronGeometry(2.5, 1);
-    const wireframe = new THREE.WireframeGeometry(geometry);
-    const line = new THREE.LineSegments(wireframe);
-
-    const material = new THREE.LineBasicMaterial({
-        color: 0x0EA5E9,
-        transparent: true,
-        opacity: 0.5,
-        linewidth: 1
-    });
-
-    line.material = material;
-    scene.add(line);
-
-    const coreGeo = new THREE.IcosahedronGeometry(1.5, 0);
-    const coreMat = new THREE.MeshBasicMaterial({
-        color: 0x0F172A,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.3
-    });
-    const core = new THREE.Mesh(coreGeo, coreMat);
-    scene.add(core);
-
-    const particlesGeo = new THREE.BufferGeometry();
-    const particlesCount = 200;
-    const posArray = new Float32Array(particlesCount * 3);
-
-    for (let i = 0; i < particlesCount * 3; i++) {
-        posArray[i] = (Math.random() - 0.5) * 10;
-    }
-
-    particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-    const particlesMat = new THREE.PointsMaterial({
-        size: 0.03,
-        color: 0x38BDF8,
-    });
-    const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
-    scene.add(particlesMesh);
-
-    const clock = new THREE.Clock();
-
-    const animate = () => {
-        requestAnimationFrame(animate);
-        const elapsedTime = clock.getElapsedTime();
-        line.rotation.y = elapsedTime * 0.1;
-        line.rotation.x = elapsedTime * 0.05;
-        core.rotation.y = -elapsedTime * 0.15;
-        core.rotation.x = -elapsedTime * 0.05;
-        particlesMesh.rotation.y = elapsedTime * 0.05;
-        renderer.render(scene, camera);
-    };
-
-    animate();
-
-    window.addEventListener('resize', () => {
-        const newWidth = canvas.parentElement.clientWidth;
-        const newHeight = canvas.parentElement.clientHeight;
-        camera.aspect = newWidth / newHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(newWidth, newHeight, false);
-    });
-}
